@@ -1,0 +1,62 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<div class="my-3" th:each="dto, state : ${list}">
+  <div>[[${dto.commentWriter}]]
+    <a href="#" th:onclick="'javascript:delComment(\''+${dto.commentSeq}+'\');'">[삭제]</a>
+  </div>
+  <div>[[${dto.commentContent}]]</div>
+</div>
+
+<hr/>
+
+<div class="my-3">
+  <form id="commentForm" method="post">
+    <input type="hidden" id="boardSeq" name="boardSeq" th:value="${param.boardSeq}">
+  <div class="mb-1">
+    <button type="button" class="btn btn-success btn-sm" id="saveComment">댓글 저장</button>
+  </div>
+  <textarea class="form-control" id="commentContent" name="commentContent" rows="3"></textarea>
+  </form>
+</div>
+</th>
+
+<script type="text/javascript" th:inline="javascript">
+$(document).ready(function () {
+      $("#saveComment").on("click", function() {
+        if ($("#commentContent").val() == "") {
+          alert("내용을 입력하세요");
+          $("#commentContent").focus();
+          return false;
+        }
+
+        const params = $("#commentForm").serialize();
+        $.ajax({
+          url : "/board/comment/save",
+          type : "POST",
+          data : params,
+          contentType : "application/x-www-form-urlencoded; charset=UTF-8",
+          dataType : "text",
+          success : function(result) {
+            comment_list($("#commentForm").find("#boardSeq").val());
+          }
+        });
+      });
+});
+
+function delComment(commentSeq) {
+  $.ajax({
+    url : "/board/comment/delete",
+    type : "POST",
+    data : {commentSeq : commentSeq},
+    contentType : "application/x-www-form-urlencoded; charset=UTF-8",
+    dataType : "text",
+    success : function(result) {
+      comment_list($("#commentForm").find("#boardSeq").val());
+    }
+  });
+}
+
+</script>
+
+
+</html>
